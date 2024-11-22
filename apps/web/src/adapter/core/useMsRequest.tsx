@@ -1,6 +1,6 @@
 import { useRequest } from 'ahooks';
-import models from '../models';
 import type { Adapter, InjectStore, PluginProps } from '../types';
+import { useModel } from './useModel';
 
 export const useMsRequest = ({
     adapter,
@@ -11,9 +11,12 @@ export const useMsRequest = ({
     viewProps: PluginProps;
     store: InjectStore;
 }) => {
-    const { model: modelType } = adapter || {};
-    const { effect, reducer } = models[modelType as keyof typeof models] || {};
     const { refreshDeps, searchParams } = store || {};
+    const { model: modelType } = adapter || {};
+    const { useFetch, useReducer } = useModel({ modelType });
+
+    const { run: effect } = useFetch();
+    const { run: reducer } = useReducer();
 
     const request = async () => {
         if (!modelType) return;

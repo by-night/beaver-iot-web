@@ -1,22 +1,28 @@
 import { InjectStore } from '@/adapter/types';
 import { awaitWrap, entityAPI, getResponseData, isRequestSuccess } from '@/services/http';
 
-export const request = async (entity: EntityOptionType) => {
-    const { value: entityId } = entity || {};
+export const useFetch = () => {
+    const request = async (entity: EntityOptionType) => {
+        const { value: entityId } = entity || {};
 
-    const [error, resp] = await awaitWrap(
-        entityAPI.getEntityStatus({
-            id: entityId,
-        }),
-    );
-    if (error || !isRequestSuccess(resp)) return;
+        const [error, resp] = await awaitWrap(
+            entityAPI.getEntityStatus({
+                id: entityId,
+            }),
+        );
+        if (error || !isRequestSuccess(resp)) return;
 
-    return getResponseData(resp);
-};
+        return getResponseData(resp);
+    };
 
-export default (searchParams: InjectStore['searchParams']) => {
-    const { entity } = searchParams || {};
-    const entityList = Array.isArray(entity) ? entity : [entity];
+    const run = (searchParams: InjectStore['searchParams']) => {
+        const { entity } = searchParams || {};
+        const entityList = Array.isArray(entity) ? entity : [entity];
 
-    return Promise.all(entityList.map(entity => request(entity)));
+        return Promise.all(entityList.map(entity => request(entity)));
+    };
+
+    return {
+        run,
+    };
 };

@@ -14,7 +14,7 @@ export interface InjectStore {
 export type SearchKeys = string[] | { key: string; value: string }[];
 
 export interface Model<T = any, D = any> {
-    effect: T;
-    reducer: D;
+    useFetch: T;
+    useReducer: D;
     searchKeys?: SearchKeys;
 }
