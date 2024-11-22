@@ -7,6 +7,10 @@
     "defaultCol": 8,
     "minRow": 4,
     "minCol": 4,
+    "adapter": {
+        "model": "multiple",
+        "websocket": false
+    },
     "configProps": [
         {
             "style": "width: 100%",
