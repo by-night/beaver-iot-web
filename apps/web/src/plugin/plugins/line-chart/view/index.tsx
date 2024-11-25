@@ -1,9 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import Chart from 'chart.js/auto'; // 引入 Chart.js
 import { useBasicChartEntity } from '@/plugin/hooks';
 import { getChartColor } from '@/plugin/utils';
 import { Tooltip } from '@/plugin/view-components';
-import { useConnect } from '@/adapter';
 import styles from './style.module.less';
 
 export interface ViewProps {
@@ -12,20 +11,20 @@ export interface ViewProps {
         title?: string;
         time: number;
     };
-    // eslint-disable-next-line react/no-unused-prop-types
-    configJson: CustomComponentProps;
+    configJson: {
+        isPreview?: boolean;
+    };
 }
 
 const View = (props: ViewProps) => {
-    const { config } = props;
-    const { title } = config || {};
-
-    /**
-     * canvas ref
-     */
-    const chartRef = useRef<HTMLCanvasElement>(null);
-    const { data } = useConnect<ViewProps['config']>({ viewProps: props }) || {};
-    const { chartShowData, chartLabels } = data || {};
+    const { config, configJson } = props;
+    const { entity, title, time } = config || {};
+    const { isPreview } = configJson || {};
+    const { chartShowData, chartLabels, chartRef } = useBasicChartEntity({
+        entity,
+        time,
+        isPreview,
+    });
 
     useEffect(() => {
         try {

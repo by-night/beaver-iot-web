@@ -3,13 +3,13 @@ import type { Result } from 'ahooks/lib/useRequest/src/types';
 import ws, { getExChangeTopic } from '@/services/ws';
 import type { InjectStore, PluginProps } from '../types';
 
-export const useMsWebsocket = ({
+export const useMsWebsocket = <T extends Record<string, any>>({
     store,
     viewProps,
     runAsync,
 }: {
     store: InjectStore;
-    viewProps: PluginProps;
+    viewProps: PluginProps<T>;
     runAsync: Result<any, []>['runAsync'];
 }) => {
     const { enableWs } = store || {};

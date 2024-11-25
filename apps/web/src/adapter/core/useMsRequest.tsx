@@ -1,26 +1,24 @@
 import { useRequest } from 'ahooks';
-import type { Adapter, InjectStore, PluginProps } from '../types';
-import { useModel } from './useModel';
+import type { InjectStore, PluginProps } from '../types';
 
-export const useMsRequest = ({
-    adapter,
+export const useMsRequest = <
+    T extends Record<string, any>,
+    E extends (...params: any[]) => any,
+    R extends (...params: any[]) => any,
+>({
     viewProps,
     store,
+    effect,
+    reducer,
 }: {
-    adapter: Adapter;
-    viewProps: PluginProps;
+    viewProps: PluginProps<T>;
     store: InjectStore;
+    effect: E;
+    reducer: R;
 }) => {
     const { refreshDeps, searchParams } = store || {};
-    const { model: modelType } = adapter || {};
-    const { useFetch, useReducer } = useModel({ modelType });
 
-    const { run: effect } = useFetch();
-    const { run: reducer } = useReducer();
-
-    const request = async () => {
-        if (!modelType) return;
-
+    const request = async (): Promise<ReturnType<R> | void> => {
         if (!effect) return;
         const data = await effect(searchParams);
 

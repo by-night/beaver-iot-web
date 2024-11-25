@@ -1,27 +1,33 @@
-import models from '../models';
 import { useProvider } from './useProvider';
 import { useMsRequest } from './useMsRequest';
 import { useMsWebsocket } from './useMsWebsocket';
 import type { PluginProps } from '../types';
 
-export const useConnect = <T extends Record<string, any>>({
+export const useConnect = <
+    T extends Record<string, any>,
+    E extends (...params: any[]) => any,
+    R extends (...params: any[]) => any,
+>({
     viewProps,
+    adapter,
+    effect,
+    reducer,
 }: {
     viewProps: PluginProps<T>;
+    adapter: Adapter;
+    effect: E;
+    reducer: R;
 }) => {
-    const { configJson } = viewProps;
-    const { adapter } = configJson || {};
+    const store = useProvider<T>({ viewProps, adapter });
 
-    const { model: modelType } = adapter || {};
-    const { searchKeys } = models[modelType as keyof typeof models] || {};
-
-    const store = useProvider({ viewProps, adapter, searchKeys });
     const result = useMsRequest({
-        adapter,
         viewProps,
         store,
+        effect,
+        reducer,
     });
-    useMsWebsocket({
+
+    useMsWebsocket<T>({
         store,
         viewProps,
         runAsync: result?.runAsync,

@@ -1,5 +1,5 @@
-import multiple from './multiple';
+import { useModel } from './multiple';
 
 export default {
-    multiple,
+    multiple: useModel,
 };

@@ -114,6 +114,17 @@ declare interface ViewThemeProps {
     style?: string;
 }
 
+declare interface Adapter {
+    /**
+     * 适用的数据模型
+     */
+    model: string;
+    /**
+     * 是否使用websocket
+     */
+    websocket?: boolean;
+}
+
 declare interface ViewProps {
     /**
      * html标签名称
@@ -165,6 +176,14 @@ declare interface ViewProps {
      * @description 支持配置多个风格
      */
     themes?: Record<ThemeType, ViewThemeProps>;
+    /**
+     * 适配器
+     */
+    adapter?: Adapter;
+    /**
+     * Chart图表配置
+     */
+    chartOptions?: Record<string>;
 }
 
 declare interface CustomComponentProps {

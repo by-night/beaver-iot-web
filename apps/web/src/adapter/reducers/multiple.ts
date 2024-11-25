@@ -1,3 +1,5 @@
+import { useTime } from '@milesight/shared/src/hooks';
+import { getChartColor } from '@/plugin/utils';
 import type { PluginProps } from '../types';
 
 export interface ChartShowDataProps {
@@ -6,6 +8,8 @@ export interface ChartShowDataProps {
 }
 
 export const useReducer = () => {
+    const { getTimeFormat } = useTime();
+
     const run = (
         result: (SearchResponseType<EntityHistoryData[]> | void)[],
         viewProps: PluginProps,
@@ -55,8 +59,9 @@ export const useReducer = () => {
         });
 
         return {
-            chartLabels: newChartLabels,
-            chartShowData: newChartShowData,
+            chartLabels: newChartLabels.map(l => getTimeFormat(Number(l))),
+            chartDatasets: newChartShowData,
+            chartColors: getChartColor(newChartShowData || []),
         };
     };
 

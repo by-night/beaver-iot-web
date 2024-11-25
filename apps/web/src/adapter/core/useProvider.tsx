@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import type { Adapter, InjectStore, PluginProps, SearchKeys } from '../types';
 
 const DEFAULT_SEARCH_KEYS = ['entity', 'time', 'metrics'];
-export const useProvider = ({
+export const useProvider = <T extends Record<string, any>>({
     viewProps,
     adapter,
     searchKeys = DEFAULT_SEARCH_KEYS,
 }: {
-    viewProps: PluginProps;
+    viewProps: PluginProps<T>;
     adapter: Adapter;
     searchKeys?: SearchKeys;
 }): InjectStore => {
