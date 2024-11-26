@@ -1,5 +1,7 @@
-import { useModel } from './multiple';
+import { useModel as useHistoryModel } from './getHistory';
+import { useModel as useAggregateModel } from './getAggregateHistory';
 
 export default {
-    multiple: useModel,
+    getHistory: useHistoryModel,
+    getAggregateHistory: useAggregateModel,
 };

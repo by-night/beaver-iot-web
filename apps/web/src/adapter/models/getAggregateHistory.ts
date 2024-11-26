@@ -1,6 +1,6 @@
 import { useConnect } from '../core';
-import { useFetch } from '../effects/getHistory';
-import { useReducer } from '../reducers/multiple';
+import { useFetch } from '../effects/getAggregateHistory';
+import { useReducer } from '../reducers/getAggregateHistory';
 import type { PluginProps } from '../types';
 
 export const useModel = <T extends Record<string, any>>({

@@ -22,7 +22,7 @@ export const useFetch = () => {
 
     const run = (searchParams: InjectStore['searchParams']) => {
         const { entity, time } = searchParams || {};
-        const entityList = Array.isArray(entity) ? entity : [entity];
+        const entityList = Array.isArray(entity) ? entity : [entity].filter(Boolean);
 
         return Promise.all(entityList.map(entity => request(entity, time)));
     };
