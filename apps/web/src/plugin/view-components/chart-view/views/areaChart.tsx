@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { merge } from 'lodash-es';
-import Chart, { ChartConfiguration } from 'chart.js/auto'; // 引入 Chart.js
+import { ChartConfiguration } from 'chart.js/auto'; // 引入 Chart.js
 import { getChartColor } from '@/plugin/utils';
+import BasicChart from '../components/basicChart';
 
 type AreaChartOpts = ChartConfiguration<'line', (string | number | null)[], string>;
 interface ChartDatasetsProps {
@@ -13,9 +14,7 @@ interface IProps {
     chartLabels: string[];
     chartOptions?: AreaChartOpts;
 }
-export default React.memo(({ chartDatasets, chartLabels, chartOptions }: IProps) => {
-    const chartRef = useRef<HTMLCanvasElement>(null);
-
+export default React.memo(({ chartDatasets = [], chartLabels = [], chartOptions }: IProps) => {
     const customChartOptions = useMemo(() => {
         const chartColors = getChartColor(chartDatasets || []);
 
@@ -45,24 +44,5 @@ export default React.memo(({ chartDatasets, chartLabels, chartOptions }: IProps)
         return merge(defaultOptions, chartOptions);
     }, [chartLabels, chartDatasets, chartOptions]);
 
-    useEffect(() => {
-        try {
-            let chart: Chart<'line', (string | number | null)[], string> | null = null;
-            if (chartRef.current) {
-                chart = new Chart(chartRef.current, customChartOptions);
-            }
-
-            return () => {
-                /**
-                 * 清空图表数据
-                 */
-                chart?.destroy();
-            };
-        } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error(error);
-        }
-    }, [chartRef, customChartOptions]);
-
-    return <canvas ref={chartRef} />;
+    return <BasicChart chartOptions={customChartOptions as ChartConfiguration} />;
 });

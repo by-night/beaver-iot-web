@@ -1,3 +1,3 @@
 export { default as Tooltip } from './tooltip';
 
-export { default as AreaChart } from './area-chart';
+export { AreaChart, BarChart, HorizonBarChart, LineChart } from './chart-view';
