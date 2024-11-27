@@ -1,12 +1,6 @@
 import Chart, { type ChartType, type DefaultDataPoint } from 'chart.js/auto';
 import GaugeController from './controller';
-import type {
-    extraDatasets,
-    GaugeNeedle,
-    GaugeOptions,
-    GaugeTicks,
-    GaugeValueLabel,
-} from './types';
+import type { extraDatasets, GaugeNeedle, GaugeTicks, GaugeValueLabel } from './types';
 
 type GenericClassConstructorParams<
     TType extends ChartType = ChartType,

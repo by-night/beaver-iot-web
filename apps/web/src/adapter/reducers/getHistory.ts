@@ -1,11 +1,5 @@
 import { useTime } from '@milesight/shared/src/hooks';
-import { getChartColor } from '@/plugin/utils';
 import type { PluginProps } from '../types';
-
-export interface ChartShowDataProps {
-    entityLabel: string;
-    entityValues: (string | number | null)[];
-}
 
 export const useReducer = () => {
     const { getTimeFormat } = useTime();
@@ -18,6 +12,7 @@ export const useReducer = () => {
         const { entity } = config || {};
 
         const historyData = (result || []).map(d => d?.content || []);
+        const entityList = Array.isArray(entity) ? entity : [entity].filter(Boolean);
 
         /**
          * 去重处理，获取所有值的时间段
@@ -30,38 +25,35 @@ export const useReducer = () => {
             }, [])
             .sort((a, b) => Number(a) - Number(b));
 
-        const newChartShowData: ChartShowDataProps[] = [];
+        const newChartDatasets: AdapterResult<EntityHistoryData['value']>[] = [];
 
-        /**
-         * 实体数据转换
-         */
         (historyData || []).forEach((h, index) => {
-            const entityLabel = (entity || [])[index]?.label || '';
-
             /**
              * 根据时间戳判断当前实体在该时间段是否有数据
              */
             const chartData = newChartLabels.map(l => {
                 const valueIndex = h.findIndex(item => item.timestamp === l);
-                if (valueIndex !== -1) {
-                    return h[valueIndex].value;
-                }
 
+                if (valueIndex !== -1) {
+                    const { value, value_type: valueType, timestamp } = h[valueIndex];
+
+                    return {
+                        key: getTimeFormat(Number(timestamp)),
+                        value,
+                        valueType,
+                    };
+                }
                 return null;
             });
 
-            if (entityLabel) {
-                newChartShowData.push({
-                    entityLabel,
-                    entityValues: chartData,
-                });
-            }
+            newChartDatasets.push({
+                entity: entityList[index],
+                data: chartData || [],
+            });
         });
 
         return {
-            chartLabels: newChartLabels.map(l => getTimeFormat(Number(l))),
-            chartDatasets: newChartShowData,
-            chartColors: getChartColor(newChartShowData || []),
+            chartDatasets: newChartDatasets,
         };
     };
 

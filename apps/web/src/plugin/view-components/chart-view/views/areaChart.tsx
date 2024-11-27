@@ -5,26 +5,21 @@ import { getChartColor } from '@/plugin/utils';
 import BasicChart from '../components/basicChart';
 
 type AreaChartOpts = ChartConfiguration<'line', (string | number | null)[], string>;
-interface ChartDatasetsProps {
-    entityLabel: string;
-    entityValues: (string | number | null)[];
-}
 interface IProps {
-    chartDatasets: ChartDatasetsProps[];
-    chartLabels: string[];
+    chartDatasets: AdapterResult[];
     chartOptions?: AreaChartOpts;
 }
-export default React.memo(({ chartDatasets = [], chartLabels = [], chartOptions }: IProps) => {
+export default React.memo(({ chartDatasets = [], chartOptions }: IProps) => {
     const customChartOptions = useMemo(() => {
         const chartColors = getChartColor(chartDatasets || []);
 
         const defaultOptions: AreaChartOpts = {
             type: 'line',
             data: {
-                labels: chartLabels || [],
+                labels: chartDatasets?.[0]?.data.map(item => item?.key),
                 datasets: (chartDatasets || []).map((chart, index) => ({
-                    label: chart.entityLabel,
-                    data: chart.entityValues,
+                    label: chart?.entity?.label,
+                    data: (chart?.data || []).map(item => item?.value),
                     borderWidth: 1,
                     fill: true,
                     spanGaps: true,
@@ -42,7 +37,7 @@ export default React.memo(({ chartDatasets = [], chartLabels = [], chartOptions 
             },
         };
         return merge(defaultOptions, chartOptions);
-    }, [chartLabels, chartDatasets, chartOptions]);
+    }, [chartDatasets, chartOptions]);
 
     return <BasicChart chartOptions={customChartOptions as ChartConfiguration} />;
 });

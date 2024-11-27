@@ -293,3 +293,12 @@ declare interface EntitySelectCommonProps<T = EntityOptionType> {
     maxCount?: number;
     onChange: (value: T | null) => void;
 }
+
+declare interface AdapterResult<T = any> {
+    entity: EntityOptionType;
+    data: ({
+        key: any;
+        value: T;
+        valueType: EntityValueDataType | null;
+    } | null)[];
+}

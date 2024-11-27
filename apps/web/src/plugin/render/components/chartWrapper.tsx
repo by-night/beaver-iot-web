@@ -9,7 +9,15 @@ interface IProps {
     tagProps: ViewProps;
     children: React.ReactElement;
 }
-const ChartTypes = ['AreaChart', 'BarChart', 'LineChart', 'HorizonBarChart'];
+const ChartTypes = [
+    'AreaChart',
+    'BarChart',
+    'LineChart',
+    'HorizonBarChart',
+    'RadarChart',
+    'PieChart',
+    'GaugeChart',
+];
 export default React.memo(({ tag, children, ...rest }: IProps) => {
     if ([...ChartTypes, 'chart'].includes(tag)) {
         return (
