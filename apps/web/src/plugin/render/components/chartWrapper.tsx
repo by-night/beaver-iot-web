@@ -17,6 +17,7 @@ const ChartTypes = [
     'RadarChart',
     'PieChart',
     'GaugeChart',
+    'RemainChart',
 ];
 export default React.memo(({ tag, children, ...rest }: IProps) => {
     if ([...ChartTypes, 'chart'].includes(tag)) {
@@ -31,12 +32,13 @@ export default React.memo(({ tag, children, ...rest }: IProps) => {
 });
 
 export const ChartBlock = React.memo(({ tag, viewProps, tagProps, children }: IProps) => {
-    const { data: injectData } = useSource({ viewProps, tagProps });
+    const { data: injectData, ...rest } = useSource({ viewProps, tagProps });
 
     if (ChartTypes.includes(tag)) {
         return React.Children.map(children, child => {
             return React.cloneElement(child, {
                 ...(injectData || {}),
+                ...rest,
             });
         });
     }

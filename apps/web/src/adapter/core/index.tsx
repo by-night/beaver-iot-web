@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useProvider } from './useProvider';
 import { useMsRequest } from './useMsRequest';
 import { useMsWebsocket } from './useMsWebsocket';
@@ -19,6 +20,7 @@ export const useConnect = <
     reducer: R;
 }) => {
     const store = useProvider<T>({ viewProps, adapter });
+    const { config, configJson } = viewProps || {};
 
     const result = useMsRequest({
         viewProps,
@@ -33,5 +35,11 @@ export const useConnect = <
         runAsync: result?.runAsync,
     });
 
-    return result;
+    return useMemo(() => {
+        return {
+            ...result,
+            config,
+            configJson,
+        };
+    }, [config, configJson, result]);
 };

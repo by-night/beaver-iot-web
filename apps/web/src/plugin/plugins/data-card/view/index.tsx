@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import * as Icons from '@milesight/shared/src/components/icons';
 import { Tooltip } from '@/plugin/view-components';
-import { useSource } from './hooks';
+import { useModel } from '@/adapter/models/getEntityStatus';
 import type { ViewConfigProps } from '../typings';
 import './style.less';
 
@@ -11,19 +11,28 @@ interface Props {
 }
 const View = (props: Props) => {
     const { config, configJson } = props;
-    const { title, entity } = config || {};
-    const { entityStatusValue } = useSource({ entity });
+    const { title } = config || {};
     const { isPreview } = configJson || {};
+
+    const { data } = useModel({
+        viewProps: props,
+        adapter: {
+            model: 'entityStatus',
+        },
+    });
+    const { chartDatasets } = data || {};
 
     // 当前实体实时数据
     const currentEntityData = useMemo(() => {
+        const [currentChartDataset] = chartDatasets || [];
+        const { entity, data } = currentChartDataset || {};
         const { rawData: currentEntity, value: entityValue } = entity || {};
         if (!currentEntity) return;
 
         // 获取当前选中实体
         const { entityValueAttribute } = currentEntity || {};
         const { enum: enumStruct, unit } = entityValueAttribute || {};
-        const currentEntityStatus = entityStatusValue?.toString();
+        const currentEntityStatus = data?.[0]?.value?.toString();
 
         // 枚举类型
         if (enumStruct) {
@@ -43,7 +52,7 @@ const View = (props: Props) => {
             label: unit ? `${currentEntityStatus ?? '- '}${unit}` : `${currentEntityStatus ?? ''}`,
             value: entityValue,
         };
-    }, [entity, entityStatusValue]);
+    }, [chartDatasets]);
     // 当前实体图标
     const { Icon, iconColor } = useMemo(() => {
         const { value } = currentEntityData || {};

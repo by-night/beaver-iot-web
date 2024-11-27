@@ -8,4 +8,5 @@ export {
     RadarChart,
     PieChart,
     GaugeChart,
+    RemainChart,
 } from './chart-view';

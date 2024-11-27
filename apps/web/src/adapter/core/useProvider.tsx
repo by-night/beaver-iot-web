@@ -63,12 +63,10 @@ export const useProvider = <T extends Record<string, any>>({
 
     /** 收集更新依赖 */
     const refreshDeps = useMemo(() => {
-        return Object.keys(configParams)
-            .map(key => {
-                if (Reflect.has(config, key)) return config[key];
-                return '';
-            })
-            .filter(Boolean);
+        return Object.keys(configParams).map(key => {
+            if (Reflect.has(config, key)) return config[key];
+            return void 0;
+        });
     }, [config, configParams]);
 
     return {

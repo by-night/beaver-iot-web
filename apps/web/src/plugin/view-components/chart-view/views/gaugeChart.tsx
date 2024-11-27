@@ -41,7 +41,7 @@ export default React.memo(({ chartDatasets, chartOptions }: IProps) => {
         return 1;
     };
 
-    const chartDataset = useMemo(() => {
+    const chartRange = useMemo(() => {
         if (!chartDatasets?.length) {
             return { minValue: 0, maxValue: 0, currentValue: 0 };
         }
@@ -62,7 +62,7 @@ export default React.memo(({ chartDatasets, chartOptions }: IProps) => {
 
     const customChartOptions = useMemo(() => {
         // 换成成符合条件的数据
-        const { minValue: min, maxValue: max, currentValue: value } = chartDataset || {};
+        const { minValue: min, maxValue: max, currentValue: value } = chartRange || {};
 
         const currentValue = value || 0;
         const minValue = min || 0;
