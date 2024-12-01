@@ -2,6 +2,7 @@ import React from 'react';
 import type { PluginProps } from '@/adapter';
 import ChartComponent from './chartComponent';
 import { useSource } from '../hooks/useSource';
+import * as chartViews from '../../view-components/chart-view';
 
 interface IProps {
     tag: string;
@@ -9,16 +10,8 @@ interface IProps {
     tagProps: ViewProps;
     children: React.ReactElement;
 }
-const ChartTypes = [
-    'AreaChart',
-    'BarChart',
-    'LineChart',
-    'HorizonBarChart',
-    'RadarChart',
-    'PieChart',
-    'GaugeChart',
-    'RemainChart',
-];
+const ChartTypes = Object.keys(chartViews);
+
 export default React.memo(({ tag, children, ...rest }: IProps) => {
     if ([...ChartTypes, 'chart'].includes(tag)) {
         return (

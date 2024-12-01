@@ -2,39 +2,37 @@ import React, { useMemo } from 'react';
 import * as Icons from '@milesight/shared/src/components/icons';
 import RemainChart from '../components/basic-icon-remaining-chart';
 
-interface IProps {
-    chartDatasets: AdapterResult[];
+interface IProps extends Pick<MultipleAdapter<number>, 'value' | 'attrs'> {
     config: Record<string, any>;
     configJson: CustomComponentProps;
 }
-export default React.memo(({ chartDatasets, config, configJson }: IProps) => {
+export default React.memo(({ value, attrs, config, configJson }: IProps) => {
     const { isPreview } = configJson || {};
     const { icon: iconType, iconColor } = config || {};
 
     const chartRange = useMemo(() => {
-        const { entity, data } = chartDatasets?.[0] || {};
-        const { rawData } = entity || {};
-        const { entityValueAttribute } = rawData || {};
-        const { min, max } = entityValueAttribute || {};
-        const { value } = data?.[0] || {};
+        const currentValue = value?.[0]?.entityValue;
+        const { range } = attrs?.[0] || {};
+
+        const { min, max } = range || {};
 
         return {
-            currentValue: value,
+            currentValue,
             minValue: min,
             maxValue: max,
         };
-    }, [chartDatasets]);
+    }, [attrs, value]);
 
     // 百分比
     const percent = useMemo(() => {
-        const { minValue: min, maxValue: max, currentValue: value } = chartRange || {};
-        if (!value) return 0;
+        const { minValue: min, maxValue: max, currentValue } = chartRange || {};
+        if (!currentValue) return 0;
 
         const range = (max || 0) - (min || 0);
-        if (range === 0 || value === max) return 100;
-        if (!range || value === min) return 0;
+        if (range === 0 || currentValue === max) return 100;
+        if (!range || currentValue === min) return 0;
 
-        const percent = Math.floor((value / range) * 100);
+        const percent = Math.floor((currentValue / range) * 100);
         return Math.min(100, Math.max(0, percent));
     }, [chartRange]);
 

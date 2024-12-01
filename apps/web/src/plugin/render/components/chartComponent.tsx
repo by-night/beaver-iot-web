@@ -2,12 +2,52 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { cloneDeep } from 'lodash-es';
 import { Chart } from 'chart.js';
 
+const createSandbox = (sharedState: string[], injectedObjects = {}) => {
+    let iframe = document.getElementById('sandbox') as HTMLIFrameElement;
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'sandbox';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+    }
+
+    const ctx = iframe.contentWindow; // 沙箱运行时的全局对象
+    if (!ctx) return;
+
+    const store: Record<string, any> = {};
+    for (const [key, value] of Object.entries(injectedObjects)) {
+        store[key] = value;
+    }
+    (ctx as any).store = store;
+
+    return new Proxy(ctx, {
+        has: (target, key: string) => {
+            return key in target || sharedState.includes(key);
+        },
+        get: (target: Record<string, any>, key: string) => {
+            if (sharedState.includes(key)) {
+                return target[key];
+            }
+            return undefined;
+        },
+        set: (target: Record<string, any>, key: string, value) => {
+            if (sharedState.includes(key)) {
+                target[key] = value;
+                return true;
+            }
+            return false;
+        },
+    });
+};
+
 /** 动态执行脚本生成数据 */
 function executeScriptsInObject(obj: Record<string, any>, injectData: any) {
     const executeScript = (script: string) => {
+        const sandbox = createSandbox(['store', 'console'], injectData);
+        const code = `with (ctx) { return (${script})(ctx.store); }`;
         // eslint-disable-next-line no-new-func
-        const func = new Function('store', script);
-        return func(injectData);
+        const fn = new Function('ctx', code);
+        return fn(sandbox);
     };
 
     const traverse = (currentObj: Record<string, any>) => {

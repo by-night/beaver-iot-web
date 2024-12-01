@@ -5,22 +5,20 @@ import { getChartColor } from '@/plugin/utils';
 import BasicChart from '../components/basicChart';
 
 type PieChartOpts = ChartConfiguration<'pie', (string | number | null)[], string>;
-interface IProps {
-    chartDatasets: AdapterResult[];
+interface IProps extends Pick<MultipleAdapter<string | number>, 'label' | 'value'> {
     chartOptions?: PieChartOpts;
 }
-export default React.memo(({ chartDatasets = [], chartOptions }: IProps) => {
+export default React.memo(({ value = [], label = [], chartOptions }: IProps) => {
     const customChartOptions = useMemo(() => {
-        const list = chartDatasets?.[0]?.data || [];
-        const chartColors = getChartColor(list || []);
+        const chartColors = getChartColor(value || []);
 
         const defaultOptions: PieChartOpts = {
             type: 'pie',
             data: {
-                labels: list.map(item => String(item?.value || '')), // 数据标签
+                labels: label, // 数据标签
                 datasets: [
                     {
-                        data: list.map(item => item?.key),
+                        data: value.map(item => item?.entityValue),
                         borderWidth: 1, // 边框宽度
                         backgroundColor: chartColors,
                     },
@@ -40,7 +38,7 @@ export default React.memo(({ chartDatasets = [], chartOptions }: IProps) => {
             },
         };
         return merge(defaultOptions, chartOptions);
-    }, [chartDatasets, chartOptions]);
+    }, [chartOptions, label, value]);
 
     return <BasicChart chartOptions={customChartOptions as ChartConfiguration} />;
 });

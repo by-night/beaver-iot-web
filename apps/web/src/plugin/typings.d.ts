@@ -294,11 +294,33 @@ declare interface EntitySelectCommonProps<T = EntityOptionType> {
     onChange: (value: T | null) => void;
 }
 
-declare interface AdapterResult<T = any> {
+declare type SingleAdapterResult<T = any> = {
+    label: string;
+    value: T;
     entity: EntityOptionType;
-    data: ({
-        key: any;
+    attrs: {
         value: T;
-        valueType: EntityValueDataType | null;
-    } | null)[];
-}
+        valueType?: EntityValueDataType;
+        range: {
+            min?: number;
+            max?: number;
+        };
+    };
+};
+
+declare type MultipleAdapter<T = any> = {
+    label: string[];
+    value: {
+        entityLabel: string;
+        entityValue: T;
+    }[];
+    entity: EntityOptionType[];
+    attrs: {
+        value: T[];
+        valueType: EntityValueDataType;
+        range: {
+            min?: number;
+            max?: number;
+        };
+    }[];
+};

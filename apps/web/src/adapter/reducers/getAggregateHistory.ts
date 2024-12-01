@@ -1,4 +1,5 @@
 import { EntityAPISchema } from '@/services/http';
+import { getRange } from '../helper';
 import type { PluginProps } from '../types';
 
 type AggregateHistoryResult = EntityAPISchema['getAggregateHistory']['response'];
@@ -6,42 +7,33 @@ export const useReducer = () => {
     const run = (
         aggregateHistoryData: (AggregateHistoryResult | void)[],
         viewProps: PluginProps,
-    ) => {
+    ): MultipleAdapter<string | number | void> => {
         const { config } = viewProps;
         const { entity } = config || {};
 
         const entityList = Array.isArray(entity) ? entity : [entity].filter(Boolean);
+        const newChartData: any[] = [];
 
-        const newChartDatasets: AdapterResult[] = aggregateHistoryData.map((historyData, index) => {
-            const { value, value_type: valueType, count_result: countResult } = historyData || {};
+        const newChartDatasets: MultipleAdapter<string | number | void>['value'] =
+            aggregateHistoryData.map(historyData => {
+                const { value, value_type: valueType } = historyData || {};
 
-            if (countResult) {
+                newChartData.push({
+                    value,
+                    valueType,
+                    range: getRange(entity),
+                });
                 return {
-                    entity: entityList[index],
-                    data: (countResult || []).map(item => {
-                        return {
-                            value: item.value,
-                            valueType: item.value_type,
-                            key: item.count,
-                        };
-                    }),
+                    entityLabel: '',
+                    entityValue: value,
                 };
-            }
-
-            return {
-                entity: entityList[index],
-                data: [
-                    {
-                        value,
-                        valueType: valueType || null,
-                        key: '',
-                    },
-                ],
-            };
-        });
+            });
 
         return {
-            chartDatasets: newChartDatasets,
+            label: (entityList || []).map(e => e?.label || ''),
+            value: newChartDatasets,
+            attrs: newChartData,
+            entity,
         };
     };
 

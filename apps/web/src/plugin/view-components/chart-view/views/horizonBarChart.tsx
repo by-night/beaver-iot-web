@@ -5,26 +5,21 @@ import { getChartColor } from '@/plugin/utils';
 import BasicChart from '../components/basicChart';
 
 type BarChartOpts = ChartConfiguration<'bar', (string | number | null)[], string>;
-interface ChartDatasetsProps {
-    entityLabel: string;
-    entityValues: (string | number | null)[];
-}
-interface IProps {
-    chartDatasets: ChartDatasetsProps[];
-    chartLabels: string[];
+
+interface IProps extends Pick<MultipleAdapter<(string | number)[]>, 'label' | 'value'> {
     chartOptions?: BarChartOpts;
 }
-export default React.memo(({ chartDatasets = [], chartLabels = [], chartOptions }: IProps) => {
+export default React.memo(({ label, value, chartOptions }: IProps) => {
     const customChartOptions = useMemo(() => {
-        const chartColors = getChartColor(chartDatasets || []);
+        const chartColors = getChartColor(value || []);
 
         const defaultOptions: BarChartOpts = {
             type: 'bar',
             data: {
-                labels: chartLabels,
-                datasets: chartDatasets.map((chart: any, index: number) => ({
-                    label: chart.entityLabel,
-                    data: chart.entityValues,
+                labels: label,
+                datasets: (value || []).map((chart, index) => ({
+                    label: chart?.entityLabel,
+                    data: chart?.entityValue || [],
                     borderWidth: 1,
                     backgroundColor: chartColors[index],
                 })),
@@ -41,7 +36,7 @@ export default React.memo(({ chartDatasets = [], chartLabels = [], chartOptions 
             },
         };
         return merge(defaultOptions, chartOptions);
-    }, [chartDatasets, chartLabels, chartOptions]);
+    }, [chartOptions, label, value]);
 
     return <BasicChart chartOptions={customChartOptions as ChartConfiguration} />;
 });

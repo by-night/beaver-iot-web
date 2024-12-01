@@ -4,12 +4,11 @@ import { useTheme } from '@milesight/shared/src/hooks';
 import BasicGaugeChart from '../components/basic-gauge-chart';
 import type { IGaugeChartConfig } from '../components/basic-gauge-chart';
 
-interface IProps {
-    chartDatasets: AdapterResult[];
+interface IProps extends Pick<MultipleAdapter<string | number | void>, 'attrs' | 'value'> {
     chartOptions?: IGaugeChartConfig;
 }
 const DEFAULT_RANGE = 10;
-export default React.memo(({ chartDatasets, chartOptions }: IProps) => {
+export default React.memo(({ value, attrs, chartOptions }: IProps) => {
     const { blue, grey } = useTheme();
 
     // 计算最适合的最大刻度值
@@ -42,23 +41,19 @@ export default React.memo(({ chartDatasets, chartOptions }: IProps) => {
     };
 
     const chartRange = useMemo(() => {
-        if (!chartDatasets?.length) {
+        if (!value?.length) {
             return { minValue: 0, maxValue: 0, currentValue: 0 };
         }
 
-        const { entity, data } = chartDatasets?.[0] || {};
-        const { value } = data?.[0] || {};
-
-        const { rawData } = entity || {};
-        const { entityValueAttribute } = rawData || {};
-        const { min, max } = entityValueAttribute || {};
         const getNumData = (value: unknown) => (Number.isNaN(Number(value)) ? 0 : Number(value));
 
-        const currentValue = getNumData(value);
+        const currentValue = getNumData(value[0].entityValue);
+        const { range } = attrs?.[0] || {};
+        const { min, max } = range || {};
         const minValue = getNumData(min);
         const maxValue = getNumData(max);
         return { minValue, maxValue, currentValue };
-    }, [chartDatasets]);
+    }, [attrs, value]);
 
     const customChartOptions = useMemo(() => {
         // 换成成符合条件的数据
@@ -153,7 +148,7 @@ export default React.memo(({ chartDatasets, chartOptions }: IProps) => {
             },
         };
         return merge(defaultOptions, chartOptions);
-    }, [blue, chartDataset, chartOptions, grey]);
+    }, [blue, chartOptions, chartRange, grey]);
 
     return <BasicGaugeChart chartOptions={customChartOptions as IGaugeChartConfig} />;
 });

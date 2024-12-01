@@ -1,4 +1,5 @@
 import { useTime } from '@milesight/shared/src/hooks';
+import { getRange } from '../helper';
 import type { PluginProps } from '../types';
 
 export const useReducer = () => {
@@ -7,7 +8,7 @@ export const useReducer = () => {
     const run = (
         result: (SearchResponseType<EntityHistoryData[]> | void)[],
         viewProps: PluginProps,
-    ) => {
+    ): MultipleAdapter<string | number | void> => {
         const { config } = viewProps;
         const { entity } = config || {};
 
@@ -25,35 +26,46 @@ export const useReducer = () => {
             }, [])
             .sort((a, b) => Number(a) - Number(b));
 
-        const newChartDatasets: AdapterResult<EntityHistoryData['value']>[] = [];
+        const newChartDatasets: any[] = [];
+        const newChartData: any[] = [];
 
+        /**
+         * 实体数据转换
+         */
         (historyData || []).forEach((h, index) => {
+            const currentEntity = entityList[index];
+            const { label: entityLabel } = currentEntity || {};
+
             /**
              * 根据时间戳判断当前实体在该时间段是否有数据
              */
             const chartData = newChartLabels.map(l => {
                 const valueIndex = h.findIndex(item => item.timestamp === l);
+                if (valueIndex === -1) return null;
 
-                if (valueIndex !== -1) {
-                    const { value, value_type: valueType, timestamp } = h[valueIndex];
+                const { value, value_type: valueType } = h[valueIndex];
 
-                    return {
-                        key: getTimeFormat(Number(timestamp)),
-                        value,
-                        valueType,
-                    };
-                }
-                return null;
+                newChartData.push({
+                    value,
+                    valueType,
+                    range: getRange(entity),
+                });
+                return value;
             });
 
-            newChartDatasets.push({
-                entity: entityList[index],
-                data: chartData || [],
-            });
+            if (entityLabel) {
+                newChartDatasets.push({
+                    entityLabel,
+                    entityValue: chartData,
+                });
+            }
         });
 
         return {
-            chartDatasets: newChartDatasets,
+            entity,
+            label: newChartLabels.map(l => getTimeFormat(Number(l))),
+            value: newChartDatasets,
+            attrs: newChartData,
         };
     };
 
