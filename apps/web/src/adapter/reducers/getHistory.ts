@@ -1,4 +1,5 @@
 import { useTime } from '@milesight/shared/src/hooks';
+import { getChartColor } from '@/plugin/utils';
 import { getRange } from '../helper';
 import type { PluginProps } from '../types';
 
@@ -66,6 +67,7 @@ export const useReducer = () => {
             label: newChartLabels.map(l => getTimeFormat(Number(l))),
             value: newChartDatasets,
             attrs: newChartData,
+            chartColors: getChartColor(newChartDatasets || []),
         };
     };
 

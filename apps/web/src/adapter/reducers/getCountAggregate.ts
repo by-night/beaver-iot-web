@@ -1,4 +1,5 @@
 import { EntityAPISchema } from '@/services/http';
+import { getChartColor } from '@/plugin/utils';
 import { getRange } from '../helper';
 import type { PluginProps } from '../types';
 
@@ -46,6 +47,7 @@ export const useReducer = () => {
             value,
             attrs,
             entity: currentEntity,
+            chartColors: getChartColor(value || []),
         };
     };
 

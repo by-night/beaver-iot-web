@@ -323,4 +323,5 @@ declare type MultipleAdapter<T = any> = {
             max?: number;
         };
     }[];
+    chartColors?: string[];
 };
